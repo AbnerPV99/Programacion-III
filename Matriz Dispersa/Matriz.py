@@ -78,7 +78,6 @@ if __name__=="__main__":
         opcion = int(input("Ingrese el numero de opcion que desea realizar: "))
         
         if opcion == 1:
-            print("Aun no esta listo")
             matriz = []
             filas = 0
             with open("heart_failure_clinical_records_dataset.csv","r") as archivo:
