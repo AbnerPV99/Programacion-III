@@ -1,17 +1,19 @@
-import pygame
+import pygame, sys
 from pygame.locals import *
-import sys
+import pygame_menu
+import pygame_menu.events
+import pygame_menu.themes
 
-pygame.init()
-ancho = 300
-altura = 300
-celda_tamanio = ancho // 3
-blanco = (255,255,255)
-negro = (0,0,0)
-fps = 30
+pygame.init() #Inicializa pygame
+ancho = 300 #Ancho de ventana
+altura = 300 #Altura de ventana
+celda_tamanio = ancho // 3 #Calcula el espacio de casilla dividiendo en 3 el ancho de la pantalla
+blanco = (255,255,255) #Color predefinido
+negro = (0,0,0) #Color predefinido
+fps = 30 #Limite de los fps
 
-pantalla = pygame.display.set_mode((ancho, altura))
-pygame.display.set_caption("Totito")
+pantalla = pygame.display.set_mode((ancho, altura)) #Crea la ventana
+pygame.display.set_caption("Menu") #Agrega un titulo a la ventana
 fuente = pygame.font.Font(None, 36)
 
 jugador = 'X'
@@ -20,11 +22,6 @@ tablero = [
     [' ', ' ', ' '],
     [' ', ' ', ' ']
 ]
-
-def dibujar_tablero():
-    for fila in tablero:
-        print('|'.join(fila))
-        print('-'*5)
 
 def verificar_ganador():
     for i in range(3):
@@ -46,21 +43,9 @@ def verificar_ganador():
     #No hay ganador aun
     return None
 
-def movimiento_jugador():
-    while True:
-        try:
-            fila = int(input("Turno del jugador\nIngrese la coordenada de la fila (0-2): "))
-            col = int(input("Ingrese la coordenada de la columna (0-2): "))
-
-            if (0 <= fila <= 2 and 0 <= col <= 2 and tablero[fila][col] == ' '):
-                tablero[fila][col] = jugador
-                break
-            else:
-                print("Movimiento no valido. Por favor, ingrese nuevamente una coordenada valida de fila y columna")
-        except ValueError:
-            print("Por favor, ingrese un valor entero para las filas y columnas")
-
+#Este es un algoritmo recursivo que determina el mejor movimiento para la maquina evaluando todas las posibilidades de juego
 def minimax(tablero, profundidad, maximizado):
+
     puntaje = {'X': -10, "O": 10, "Empate": 0}
     
     resultado = verificar_ganador()
@@ -103,20 +88,21 @@ def movimiento_maquina():
                 if punteo > mejor_puntaje:
                     mejor_puntaje = punteo
                     mejor_jugada = (i, j)
-    print("El valor de la mejor jugada es :", mejor_puntaje) 
+    print("El valor de la mejor jugada es: ", mejor_puntaje) 
+    print("La posicion de la mejor jugada es: ", mejor_jugada)
     return mejor_jugada
 
 def dibujar_X(x, y):
-    pygame.draw.line(pantalla, negro, (x + 20, y +  20), (x + celda_tamanio - 20, y + celda_tamanio - 20), 2)
-    pygame.draw.line(pantalla, negro, (x + celda_tamanio - 20, y + 20), (x + 20, y + celda_tamanio - 20), 2)
+    pygame.draw.line(pantalla, negro, (x + 20, y +  20), (x + celda_tamanio - 20, y + celda_tamanio - 20), 2) #Dibuja una linea recta inclinada hacia la derecha
+    pygame.draw.line(pantalla, negro, (x + celda_tamanio - 20, y + 20), (x + 20, y + celda_tamanio - 20), 2) #Dibuja una linea recta inclinada hacia la izquierda
 
 def dibujar_O(x,y):
-    pygame.draw.circle(pantalla, negro, (x + celda_tamanio // 2, y + celda_tamanio // 2), celda_tamanio // 2 - 20, 2)
+    pygame.draw.circle(pantalla, negro, (x + celda_tamanio // 2, y + celda_tamanio // 2), celda_tamanio // 2 - 20, 2) #Dibuja el circulo
 
 def juego(posicion_mouse):
     fila = posicion_mouse[1] // celda_tamanio
     col = posicion_mouse[0] // celda_tamanio
-    return int(fila), int(col)
+    return int(fila), int(col) #Guarda la posicion de la fila y columna de la tupla y lo retorna como entero
 
 def dibujar_tablero(tablero):
     for i in range(1, 3):
@@ -131,19 +117,25 @@ def dibujar_tablero(tablero):
             elif jugador == 'O':
                 dibujar_O(col * celda_tamanio, fila * celda_tamanio)
 
-def main():
+def historial():
+    print("Aun no esta listo")
+
+def integrantes():
+    print("Aun no esta listo")
+
+def partida():
     global tablero, jugador, pantalla
-
+    
     reloj = pygame.time.Clock()
-
+    #Bucle del juego
     while True:
         for evento in pygame.event.get():
             if evento.type == QUIT:
-                pygame.quit()
-                sys.exit()
-            elif evento.type == MOUSEBUTTONDOWN:
+                pygame.quit() #Cierra la ventana
+                sys.exit() #Cierra el programa
+            elif evento.type == MOUSEBUTTONDOWN: #Cuando el evento es presionar un boton del mouse
                 if jugador == 'X':
-                    fila, col = juego(pygame.mouse.get_pos())
+                    fila, col = juego(pygame.mouse.get_pos()) #Obtiene la coordenada de la fila y columna del tablero
                     if tablero[fila][col] == ' ':
                         tablero[fila][col] = 'X'
                         jugador = 'O'
@@ -155,20 +147,34 @@ def main():
                 print("Partida empatada")
             else:
                 print(f"El jugador {ganador} ha ganado!")
-            pygame.quit()
-            sys.exit()
+            
+            menu.mainloop(pantalla) #Regresa al menu principal
+            tablero = [
+                [' ', ' ', ' '],
+                [' ', ' ', ' '],
+                [' ', ' ', ' ']
+            ]
+            #pygame.quit() #Cierra la ventana
+            #sys.exit() #Cierra el programa
 
-        pantalla.fill(blanco)
+        pantalla.fill(blanco) #Rellena la pantalla de color blanco
         dibujar_tablero(tablero)
 
-        pygame.display.flip()
-        reloj.tick(fps)
+        pygame.display.flip() #Genera la ventana
+        reloj.tick(fps) #Limita los fps a 30
 
         if jugador == 'O':
             filaM, colM = movimiento_maquina()
             if tablero[filaM][colM] == ' ':
                 tablero[filaM][colM] = 'O'
-                jugador = 'X'
+                jugador = 'X' 
+
+menu = pygame_menu.Menu("Menu Principal", 300,300, theme=pygame_menu.themes.THEME_BLUE) #Crea nuestra ventana del menu
+menu.add.button("Jugar", partida) #Agrega un boton de Jugar que envia a la funcion de partida
+menu.add.button("Ver Historial", historial) #Agrega un boton de Historial que envia a la funcion de Historial
+menu.add.button("Integrantes", integrantes) #Agrega un boton de Integrantes que muestra la informacion del grupo
+menu.add.button("Salir", pygame_menu.events.EXIT) #Sale del programa
+
 
 if __name__ == '__main__':
-    main()
+    menu.mainloop(pantalla)
